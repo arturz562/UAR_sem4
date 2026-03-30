@@ -60,7 +60,7 @@
         // this,SLOT(slot_newMsg()));
         // emit newClientConnected(adr.toString());
     }
-    void MyTCPServer::slot_client_disconnetcted()
+    void MyTCPServer::slot_client_disconnected()
     {
         // int idx = getClinetID();
         // m_clients.removeAt(idx);

@@ -25,7 +25,7 @@
         void newMsgFrom(QJsonObject json, int num);
     private slots:
         void slot_new_client();
-        void slot_client_disconnetcted();
+        void slot_client_disconnected();
         void slot_newMsg();
     private:
         int getClinetID();
