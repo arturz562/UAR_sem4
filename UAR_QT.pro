@@ -2,9 +2,14 @@ QT       += core gui widgets charts
 
 CONFIG   += c++17
 
+CONFIG += console
+
+QT += core network
+
 INCLUDEPATH += W_DANYCH W_USLUG W_PREZENTACJI W_TESTY
 
 SOURCES += \
+    KlientKonfiguracji.cpp \
     W_DANYCH/GeneratorWartosciZadanej.cpp \
     W_DANYCH/ModelARX.cpp \
     W_DANYCH/RegulatorPID.cpp \
@@ -15,9 +20,11 @@ SOURCES += \
     W_USLUG/KlasaUslugowa.cpp \
     W_DANYCH/ProstyUAR.cpp \
     W_DANYCH/Symulacja.cpp \
-    main.cpp
+    main.cpp \
+    serwerkonfiguracji.cpp
 
 HEADERS += \
+    KlientKonfiguracji.h \
     W_DANYCH/GeneratorWartosciZadanej.h \
     W_DANYCH/ModelARX.h \
     W_DANYCH/RegulatorPID.h \
@@ -27,7 +34,8 @@ HEADERS += \
     W_TESTY/TestyDodatkowe.h \
     W_USLUG/KlasaUslugowa.h \
     W_DANYCH/ProstyUAR.h \
-    W_DANYCH/Symulacja.h
+    W_DANYCH/Symulacja.h \
+    serwerkonfiguracji.h
 
 FORMS += \
     W_PREZENTACJI/ParametryARX.ui \
