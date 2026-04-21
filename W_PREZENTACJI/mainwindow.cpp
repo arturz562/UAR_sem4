@@ -19,6 +19,21 @@ MainWindow::MainWindow(QWidget *parent, KlasaUslugowa *usluga)
 {
     ui->setupUi(this);
 
+    // --- PID  ---
+    ui->spinPidKp->setRange(0.0, 100.0); ui->spinPidKp->setSingleStep(0.1);
+    ui->spinPidTi->setRange(0.0, 100.0); ui->spinPidTi->setSingleStep(1.0);
+    ui->spinPidTd->setRange(0.0, 100.0); ui->spinPidTd->setSingleStep(0.1);
+
+    // --- GENERATOR  ---
+    ui->spinAmplituda->setRange(0.0, 100.0);   ui->spinAmplituda->setSingleStep(1.0);
+    ui->spinOkres->setRange(0.0, 100.0);       ui->spinOkres->setSingleStep(1.0);
+    ui->spinWypelnienie->setRange(0.0, 1.0);   ui->spinWypelnienie->setSingleStep(0.1);
+    ui->spinSkladowaStala->setRange(-100.0, 100.0); ui->spinSkladowaStala->setSingleStep(1.0);
+
+    // --- PARAMETRY SYMULACJI  ---
+    ui->spinInterwal->setRange(10, 500);         ui->spinInterwal->setSingleStep(10);
+    ui->spinOknoObserwacji->setRange(5, 50);     ui->spinOknoObserwacji->setSingleStep(5);
+
     if (!m_usluga) {
         m_usluga = new KlasaUslugowa(this);
     }

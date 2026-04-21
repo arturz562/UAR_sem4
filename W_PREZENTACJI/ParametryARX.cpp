@@ -8,6 +8,16 @@ ParametryARX::ParametryARX(QWidget *parent) :
     ui(new Ui::ParametryARX)
 {
     ui->setupUi(this);
+
+    // --- ARX ---
+    ui->spinOpoznienie->setRange(1, 20);      ui->spinOpoznienie->setSingleStep(1);
+    ui->spinZaklocenie->setRange(0.0, 0.1);   ui->spinZaklocenie->setSingleStep(0.01);
+
+
+    ui->spinMinU->setRange(-100.0, 100.0);    ui->spinMinU->setSingleStep(1.0);
+    ui->spinMaxU->setRange(-100.0, 100.0);    ui->spinMaxU->setSingleStep(1.0);
+    ui->spinMinY->setRange(-100.0, 100.0);    ui->spinMinY->setSingleStep(1.0);
+    ui->spinMaxY->setRange(-100.0, 100.0);    ui->spinMaxY->setSingleStep(1.0);
 }
 
 ParametryARX::~ParametryARX()
@@ -62,6 +72,16 @@ void ParametryARX::on_pushZapisz_clicked()
         return;
     }
 
+    // wartości min < wartości max
+    if (uMin >= uMax) {
+        QMessageBox::warning(this, "Błąd", "Nasycenie wejścia: Min U musi być mniejsze od Max U!");
+        return;
+    }
+    if (yMin >= yMax) {
+        QMessageBox::warning(this, "Błąd", "Nasycenie wyjścia: Min Y musi być mniejsze od Max Y!");
+        return;
+    }
+
     emit zglosNoweParametry(tempA, tempB, opoznienie, szum, uMin, uMax, yMin, yMax);
     this->accept();
 }
@@ -81,7 +101,11 @@ std::vector<double> ParametryARX::stringToVector(const QString& str) const
         tempS.replace(",", ".");
         bool ok;
         double val = tempS.toDouble(&ok);
-        if(ok) vec.push_back(val);
+        if(ok) {
+            // zakres: <-2.0, 2.0>
+            val = std::clamp(val, -2.0, 2.0);
+            vec.push_back(val);
+        }
     }
     return vec;
 }
