@@ -4,6 +4,11 @@
 #include <QMainWindow>
 #include <QtCharts>
 #include "W_USLUG/KlasaUslugowa.h"
+#include "ProtokolSieciowy.h"
+#include "SerwerKonfiguracji.h"
+#include "KlientKonfiguracji.h"
+
+enum class TrybPracy { Stacjonarny, SieciowyRegulator, SieciowyObiekt };
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,6 +39,8 @@ private slots:
     void on_pushLoadConfig_clicked();
     void on_pushResetPID_clicked();
 
+    void on_pushPolaczSiec_clicked();
+
     void on_spinOknoObserwacji_editingFinished();
 
     void on_spinAmplituda_editingFinished();
@@ -56,11 +63,21 @@ private slots:
 
     void resetSymulacji();
 
-    void on_checkBox_toggled(bool checked);
+    // void on_checkBox_toggled(bool checked);
+
+    void naOdebranoKonfigPID(double kp, double ti, double td, int metoda);
+    void naOdebranoKonfigARX(std::vector<double> A, std::vector<double> B, int opoznienie, double szum);
+    void naOdebranoKonfigGen(double amplituda, double okres, int interwal, int typ, double skladowa, double wypelnienie);
+    void naOdebranoAkcjeSymulacji(Akcja akcja, int parametr);
 
 private:
     Ui::MainWindow *ui;
     KlasaUslugowa *m_usluga;
+
+    TrybPracy m_obecnyTryb = TrybPracy::Stacjonarny;
+    MyTCPServer *m_serwer = nullptr;
+    MyTCPClient *m_klient = nullptr;
+
     double m_oknoCzasowe;
 
     QChart *m_chartOutput, *m_chartError, *m_chartControl, *m_chartPID;
@@ -72,6 +89,8 @@ private:
     QLineSeries* dodajSerie(QChart* chart, QString nazwa, QColor kolor);
     void zarzadzajWykresem(QChart* chart, double t);
     void odswiezGUI();
+
+    void ustawTrybGUI(TrybPracy tryb);
 };
 
 #endif // MAINWINDOW_H

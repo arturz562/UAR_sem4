@@ -78,6 +78,13 @@ public:
     QHBoxLayout *horizontalLayout_File;
     QPushButton *pushSaveConfig;
     QPushButton *pushLoadConfig;
+    QGroupBox *groupBox_Siec;
+    QGridLayout *gridLayout_2;
+    QLabel *label_2;
+    QLabel *labelTryb;
+    QPushButton *pushPolaczSiec;
+    QLabel *labelPolaczono;
+    QLabel *labelIP;
     QSpacerItem *verticalSpacer;
     QStatusBar *statusbar;
 
@@ -109,7 +116,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 278, 764));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -79, 276, 845));
         verticalLayout_Controls = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_Controls->setObjectName("verticalLayout_Controls");
         verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
@@ -322,6 +329,40 @@ public:
 
         verticalLayout_Controls->addWidget(groupBox_File);
 
+        groupBox_Siec = new QGroupBox(scrollAreaWidgetContents);
+        groupBox_Siec->setObjectName("groupBox_Siec");
+        gridLayout_2 = new QGridLayout(groupBox_Siec);
+        gridLayout_2->setObjectName("gridLayout_2");
+        label_2 = new QLabel(groupBox_Siec);
+        label_2->setObjectName("label_2");
+        label_2->setEnabled(false);
+
+        gridLayout_2->addWidget(label_2, 2, 0, 1, 1);
+
+        labelTryb = new QLabel(groupBox_Siec);
+        labelTryb->setObjectName("labelTryb");
+
+        gridLayout_2->addWidget(labelTryb, 2, 1, 1, 1);
+
+        pushPolaczSiec = new QPushButton(groupBox_Siec);
+        pushPolaczSiec->setObjectName("pushPolaczSiec");
+
+        gridLayout_2->addWidget(pushPolaczSiec, 0, 0, 1, 2);
+
+        labelPolaczono = new QLabel(groupBox_Siec);
+        labelPolaczono->setObjectName("labelPolaczono");
+        labelPolaczono->setEnabled(false);
+
+        gridLayout_2->addWidget(labelPolaczono, 3, 0, 1, 1);
+
+        labelIP = new QLabel(groupBox_Siec);
+        labelIP->setObjectName("labelIP");
+
+        gridLayout_2->addWidget(labelIP, 3, 1, 1, 1);
+
+
+        verticalLayout_Controls->addWidget(groupBox_Siec);
+
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
         verticalLayout_Controls->addItem(verticalSpacer);
@@ -374,6 +415,12 @@ public:
         groupBox_File->setTitle(QCoreApplication::translate("MainWindow", "Konfiguracja JSON", nullptr));
         pushSaveConfig->setText(QCoreApplication::translate("MainWindow", "Zapisz", nullptr));
         pushLoadConfig->setText(QCoreApplication::translate("MainWindow", "Wczytaj", nullptr));
+        groupBox_Siec->setTitle(QCoreApplication::translate("MainWindow", "Konfiguracja sieci", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "Tryb:", nullptr));
+        labelTryb->setText(QString());
+        pushPolaczSiec->setText(QCoreApplication::translate("MainWindow", "Po\305\202\304\205cz", nullptr));
+        labelPolaczono->setText(QCoreApplication::translate("MainWindow", "Oczekuje na po\305\202\304\205czenie...", nullptr));
+        labelIP->setText(QString());
     } // retranslateUi
 
 };

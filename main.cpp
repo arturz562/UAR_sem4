@@ -10,8 +10,33 @@
 #include "KlientKonfiguracji.h"
 
 //#define TRYB_TESTOWY
-#define KONSOLA
 
+extern void uruchomWszystkieTesty();
+
+int main(int argc, char *argv[])
+{
+#ifdef TRYB_TESTOWY
+    uruchomWszystkieTesty();
+    return 0;
+#else
+    uruchomWszystkieTesty();
+    QApplication a(argc, argv);
+
+    KlasaUslugowa usluga;
+
+    MainWindow w(nullptr, &usluga);
+
+    w.show();
+
+    return a.exec();
+#endif
+}
+
+/*
+//#define TRYB_TESTOWY
+#define MAIN
+
+/*
 extern void uruchomWszystkieTesty();
 
 int main(int argc, char *argv[])
@@ -162,7 +187,7 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef MAIN
-    uruchomWszystkieTesty();
+    //uruchomWszystkieTesty();
     QApplication a(argc, argv);
 
     KlasaUslugowa usluga;
@@ -174,3 +199,4 @@ int main(int argc, char *argv[])
     return a.exec();
 #endif
 }
+*/

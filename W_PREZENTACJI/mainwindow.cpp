@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ParametryARX.h"
+#include "DialogPolaczenie.h"
 #include <QSignalBlocker>
 #include <QFileDialog>
 #include <QLineEdit>
@@ -11,17 +12,24 @@
 static constexpr double DOMYSLNE_OKNO_CZASOWE = 10.0;
 static constexpr double MARGINES_Y = 0.1;
 
+//enum class TrybAplikacji { Stacjonarny, SieciowyRegulator, SieciowyObiekt };
+
 MainWindow::MainWindow(QWidget *parent, KlasaUslugowa *usluga)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_usluga(usluga)
     , m_oknoCzasowe(DOMYSLNE_OKNO_CZASOWE)
+    , m_serwer(nullptr) // Inicjalizacja
+    , m_klient(nullptr) // Inicjalizacja
 {
     ui->setupUi(this);
 
     if (!m_usluga) {
         m_usluga = new KlasaUslugowa(this);
     }
+
+    ui->label_2->setVisible(false);
+    ui->labelPolaczono->setVisible(false);
 
     QVBoxLayout* layoutMain = new QVBoxLayout(ui->widgetWykresy);
     layoutMain->setContentsMargins(0, 0, 0, 0);
@@ -230,6 +238,14 @@ void MainWindow::aktualizujParametryGeneratora() {
         ui->spinSkladowaStala->value(),
         ui->spinWypelnienie->value()
         );
+
+    // --- WYSYŁANIE PRZEZ SIEĆ ---
+    if (m_obecnyTryb == TrybPracy::SieciowyRegulator && m_serwer) {
+        m_serwer->wyslijKonfigGen(ui->spinAmplituda->value(), ui->spinOkres->value(), ui->spinInterwal->value(), typ, ui->spinSkladowaStala->value(), ui->spinWypelnienie->value());
+    }
+    else if (m_obecnyTryb == TrybPracy::SieciowyObiekt && m_klient && m_klient->isConnected()) {
+        m_klient->wyslijKonfigGen(ui->spinAmplituda->value(), ui->spinOkres->value(), ui->spinInterwal->value(), typ, ui->spinSkladowaStala->value(), ui->spinWypelnienie->value());
+    }
 }
 
 void MainWindow::aktualizujParametryPID() {
@@ -239,6 +255,14 @@ void MainWindow::aktualizujParametryPID() {
         ui->spinPidTd->value(),
         ui->comboMetCalk->currentIndex()
         );
+
+    // --- WYSYŁANIE PRZEZ SIEĆ ---
+    if (m_obecnyTryb == TrybPracy::SieciowyRegulator && m_serwer) {
+        m_serwer->wyslijKonfigPID(ui->spinPidKp->value(), ui->spinPidTi->value(), ui->spinPidTd->value(), ui->comboMetCalk->currentIndex());
+    }
+    else if (m_obecnyTryb == TrybPracy::SieciowyObiekt && m_klient && m_klient->isConnected()) {
+        m_klient->wyslijKonfigPID(ui->spinPidKp->value(), ui->spinPidTi->value(), ui->spinPidTd->value(), ui->comboMetCalk->currentIndex());
+    }
 }
 
 void MainWindow::on_pushStart_clicked() { m_usluga->start(); }
@@ -280,6 +304,11 @@ void MainWindow::on_pushConfigARX_clicked() {
 
 void MainWindow::odbierzParametryARX(std::vector<double> a, std::vector<double> b, int k, double szum, double umin, double umax, double ymin, double ymax) {
     m_usluga->ustawModel(a, b, k, szum, umin, umax, ymin, ymax);
+
+    // WYSYŁANIE PRZEZ SIEĆ (Tylko obiekt to może edytować, więc tylko on wysyła)
+    if (m_obecnyTryb == TrybPracy::SieciowyObiekt && m_klient && m_klient->isConnected()) {
+        m_klient->wyslijKonfigARX(a, b, k, szum);
+    }
 }
 
 void MainWindow::on_pushSaveConfig_clicked() {
@@ -375,8 +404,119 @@ void MainWindow::on_spinOknoObserwacji_editingFinished()
 
 
 
-void MainWindow::on_checkBox_toggled(bool checked)
-{
+// void MainWindow::on_checkBox_toggled(bool checked)
+// {
 
+// }
+
+// Funkcja wywoływana po kliknięciu przycisku "Sieć / Połącz" w głównym oknie
+void MainWindow::on_pushPolaczSiec_clicked()
+{
+    DialogPolaczenie dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        if (dialog.czySerwer()) {
+            ustawTrybGUI(TrybPracy::SieciowyRegulator);
+
+            // Czyszczenie starego połączenia jeśli było
+            if(m_serwer) { m_serwer->deleteLater(); }
+            m_serwer = new MyTCPServer(this);
+
+            // Podpięcie sygnałów
+            connect(m_serwer, &MyTCPServer::odebranoKonfigPID, this, &MainWindow::naOdebranoKonfigPID);
+            connect(m_serwer, &MyTCPServer::odebranoKonfigGen, this, &MainWindow::naOdebranoKonfigGen);
+            connect(m_serwer, &MyTCPServer::odebranoKonfigARX, this, &MainWindow::naOdebranoKonfigARX);
+            connect(m_serwer, &MyTCPServer::odebranoAkcjeSymulacji, this, &MainWindow::naOdebranoAkcjeSymulacji);
+
+            m_serwer->startListening(dialog.getPort());
+
+            ui->label_2->setVisible(true);
+
+            ui->labelTryb->setText("Regulator");
+        } else {
+            ustawTrybGUI(TrybPracy::SieciowyObiekt);
+
+            if(m_klient) { m_klient->deleteLater(); }
+            m_klient = new MyTCPClient(this);
+
+            // Podpięcie sygnałów
+            connect(m_klient, &MyTCPClient::odebranoKonfigPID, this, &MainWindow::naOdebranoKonfigPID);
+            connect(m_klient, &MyTCPClient::odebranoKonfigGen, this, &MainWindow::naOdebranoKonfigGen);
+            connect(m_klient, &MyTCPClient::odebranoKonfigARX, this, &MainWindow::naOdebranoKonfigARX);
+            connect(m_klient, &MyTCPClient::odebranoAkcjeSymulacji, this, &MainWindow::naOdebranoAkcjeSymulacji);
+
+            m_klient->connectTo(dialog.getIP(), dialog.getPort());
+
+            ui->labelTryb->setText("Obiekt");
+        }
+    }
 }
 
+void MainWindow::ustawTrybGUI(TrybPracy tryb)
+{
+    m_obecnyTryb = tryb;
+
+    switch (tryb) {
+    case TrybPracy::Stacjonarny:
+        // Włączamy wszystkie sekcje konfiguracyjne
+        ui->groupBox_Sim->setEnabled(true);
+        ui->groupBox_Gen->setEnabled(true);
+        ui->groupBox_PID->setEnabled(true);
+        ui->groupBox_ARX->setEnabled(true);
+        break;
+
+    case TrybPracy::SieciowyRegulator:
+        // Regulator: aktywny Generator, PID, Symulacja. Blokada ARX (działa zdalnie).
+        ui->groupBox_Sim->setEnabled(true);
+        ui->groupBox_Gen->setEnabled(true);
+        ui->groupBox_PID->setEnabled(true);
+        ui->groupBox_ARX->setEnabled(false);
+        break;
+
+    case TrybPracy::SieciowyObiekt:
+        // Obiekt: tylko ARX aktywny. Reszta sterowana z zewnątrz.
+        ui->groupBox_Sim->setEnabled(false);
+        ui->groupBox_Gen->setEnabled(false);
+        ui->groupBox_PID->setEnabled(false);
+        ui->groupBox_ARX->setEnabled(true);
+        break;
+    }
+}
+
+void MainWindow::naOdebranoKonfigPID(double kp, double ti, double td, int metoda) {
+    m_usluga->ustawPID(kp, ti, td, metoda);
+    odswiezGUI(); // Odświeży spinboxy bez wyzwalania sygnałów nadawczych
+}
+
+void MainWindow::naOdebranoKonfigGen(double amplituda, double okres, int interwal, int typ, double skladowa, double wypelnienie) {
+    m_usluga->ustawGenerator(amplituda, okres, interwal, typ, skladowa, wypelnienie);
+    odswiezGUI();
+}
+
+void MainWindow::naOdebranoKonfigARX(std::vector<double> A, std::vector<double> B, int opoznienie, double szum) {
+    // Ponieważ ARX ma też ograniczenia (umin, umax itp.), których nie przesyłaliśmy dla oszczędności transferu,
+    // najpierw pobierzmy obecne ograniczenia, a potem zaktualizujmy resztę.
+    std::vector<double> oldA, oldB;
+    int oldOp; double oldSzum, uMin, uMax, yMin, yMax;
+    m_usluga->pobierzModel(oldA, oldB, oldOp, oldSzum, uMin, uMax, yMin, yMax);
+
+    m_usluga->ustawModel(A, B, opoznienie, szum, uMin, uMax, yMin, yMax);
+    // GUI z ARX odpala się z osobnego okna, więc nie trzeba tu wołać odswiezGUI dla ARXa
+}
+
+void MainWindow::naOdebranoAkcjeSymulacji(Akcja akcja, int parametr) {
+    switch(akcja) {
+    case Akcja::Start: m_usluga->start(); break;
+    case Akcja::Stop: m_usluga->stop(); break;
+    case Akcja::Reset:
+        m_usluga->reset();
+        resetSymulacji();
+        break;
+    case Akcja::ZmienInterwal:
+        m_usluga->setInterwal(parametr);
+        // Odśwież SpinBox interwału z zablokowaniem sygnałów
+        ui->spinInterwal->blockSignals(true);
+        ui->spinInterwal->setValue(parametr);
+        ui->spinInterwal->blockSignals(false);
+        break;
+    }
+}

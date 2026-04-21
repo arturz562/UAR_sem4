@@ -9,7 +9,9 @@ QT += core network
 INCLUDEPATH += W_DANYCH W_USLUG W_PREZENTACJI W_TESTY
 
 SOURCES += \
+    DialogPolaczenie.cpp \
     KlientKonfiguracji.cpp \
+    SerwerKonfiguracji.cpp \
     W_DANYCH/GeneratorWartosciZadanej.cpp \
     W_DANYCH/ModelARX.cpp \
     W_DANYCH/RegulatorPID.cpp \
@@ -20,11 +22,13 @@ SOURCES += \
     W_USLUG/KlasaUslugowa.cpp \
     W_DANYCH/ProstyUAR.cpp \
     W_DANYCH/Symulacja.cpp \
-    main.cpp \
-    serwerkonfiguracji.cpp
+    main.cpp
 
 HEADERS += \
+    DialogPolaczenie.h \
     KlientKonfiguracji.h \
+    ProtokolSieciowy.h \
+    SerwerKonfiguracji.h \
     W_DANYCH/GeneratorWartosciZadanej.h \
     W_DANYCH/ModelARX.h \
     W_DANYCH/RegulatorPID.h \
@@ -34,10 +38,10 @@ HEADERS += \
     W_TESTY/TestyDodatkowe.h \
     W_USLUG/KlasaUslugowa.h \
     W_DANYCH/ProstyUAR.h \
-    W_DANYCH/Symulacja.h \
-    serwerkonfiguracji.h
+    W_DANYCH/Symulacja.h
 
 FORMS += \
+    DialogPolaczenie.ui \
     W_PREZENTACJI/ParametryARX.ui \
     W_PREZENTACJI/mainwindow.ui
 

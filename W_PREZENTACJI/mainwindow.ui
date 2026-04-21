@@ -55,9 +55,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
-         <width>278</width>
-         <height>764</height>
+         <y>-79</y>
+         <width>276</width>
+         <height>845</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_Controls">
@@ -371,6 +371,56 @@
             <widget class="QPushButton" name="pushLoadConfig">
              <property name="text">
               <string>Wczytaj</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_Siec">
+          <property name="title">
+           <string>Konfiguracja sieci</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Tryb:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="labelTryb">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QPushButton" name="pushPolaczSiec">
+             <property name="text">
+              <string>Połącz</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="labelPolaczono">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Oczekuje na połączenie...</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="labelIP">
+             <property name="text">
+              <string/>
              </property>
             </widget>
            </item>
