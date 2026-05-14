@@ -100,6 +100,16 @@ void ParametryARX::on_pushZapisz_clicked()
     }
 
 
+    // wartości min < wartości max
+    if (uMin >= uMax) {
+        QMessageBox::warning(this, "Błąd", "Nasycenie wejścia: Min U musi być mniejsze od Max U!");
+        return;
+    }
+    if (yMin >= yMax) {
+        QMessageBox::warning(this, "Błąd", "Nasycenie wyjścia: Min Y musi być mniejsze od Max Y!");
+        return;
+    }
+
     emit zglosNoweParametry(tempA, tempB, opoznienie, szum, uMin, uMax, yMin, yMax);
     this->accept();
 }
