@@ -8,6 +8,16 @@ ParametryARX::ParametryARX(QWidget *parent) :
     ui(new Ui::ParametryARX)
 {
     ui->setupUi(this);
+
+    // --- ARX ---
+    ui->spinOpoznienie->setRange(1, 20);      ui->spinOpoznienie->setSingleStep(1);
+    ui->spinZaklocenie->setRange(0.0, 0.1);   ui->spinZaklocenie->setSingleStep(0.01);
+
+
+    ui->spinMinU->setRange(-100.0, 100.0);    ui->spinMinU->setSingleStep(1.0);
+    ui->spinMaxU->setRange(-100.0, 100.0);    ui->spinMaxU->setSingleStep(1.0);
+    ui->spinMinY->setRange(-100.0, 100.0);    ui->spinMinY->setSingleStep(1.0);
+    ui->spinMaxY->setRange(-100.0, 100.0);    ui->spinMaxY->setSingleStep(1.0);
 }
 
 ParametryARX::~ParametryARX()
@@ -30,6 +40,13 @@ void ParametryARX::ustawDane(const std::vector<double>& a, const std::vector<dou
         ui->spinZaklocenie->setValue(szum);
     }
 
+    //
+    if (umin <= std::numeric_limits<double>::min() && ymin <= std::numeric_limits<double>::min() && umax >= std::numeric_limits<double>::max() && ymax <= std::numeric_limits<double>::max())   {
+        ui->checkOgraniczenia->setChecked(false);
+    }
+    else ui->checkOgraniczenia->setChecked(true);
+    //
+
     ui->spinMinU->setValue(umin);
     ui->spinMaxU->setValue(umax);
     ui->spinMinY->setValue(ymin);
@@ -40,6 +57,8 @@ void ParametryARX::ustawDane(const std::vector<double>& a, const std::vector<dou
         .arg(strA).arg(strB).arg(opoznienie).arg(szum);
         ui->labelCurrentSummary->setText(info);
     }
+
+    //ui->checkOgraniczenia->
 }
 
 void ParametryARX::on_pushZapisz_clicked()
@@ -52,15 +71,34 @@ void ParametryARX::on_pushZapisz_clicked()
 
     int opoznienie = ui->spinOpoznienie->value();
     double szum = (ui->spinZaklocenie) ? ui->spinZaklocenie->value() : 0.0;
-    double uMin = ui->spinMinU->value();
-    double uMax = ui->spinMaxU->value();
-    double yMin = ui->spinMinY->value();
-    double yMax = ui->spinMaxY->value();
+    double uMin;// = ui->spinMinU->value();
+    double uMax;// = ui->spinMaxU->value();
+    double yMin;// = ui->spinMinY->value();
+    double yMax;// = ui->spinMaxY->value();
+
+    // wartości min < wartości max
+
+
+    if (ui->checkOgraniczenia->isChecked()) {
+        uMin = ui->spinMinU->value();
+        uMax = ui->spinMaxU->value();
+        yMin = ui->spinMinY->value();
+        yMax = ui->spinMaxY->value();
+    } else {
+        // Symulacja braku ograniczeń (ogromne limity)
+        uMin = std::numeric_limits<double>::min(); uMax = std::numeric_limits<double>::max();
+        yMin = std::numeric_limits<double>::min(); yMax = std::numeric_limits<double>::max();
+    }
 
     if (uMin >= uMax) {
-        QMessageBox::warning(this, "Błąd", "Min U musi być mniejsze od Max U!");
+        QMessageBox::warning(this, "Błąd", "Nasycenie wejścia: Min U musi być mniejsze od Max U!");
         return;
     }
+    if (yMin >= yMax) {
+        QMessageBox::warning(this, "Błąd", "Nasycenie wyjścia: Min Y musi być mniejsze od Max Y!");
+        return;
+    }
+
 
     emit zglosNoweParametry(tempA, tempB, opoznienie, szum, uMin, uMax, yMin, yMax);
     this->accept();
@@ -81,7 +119,11 @@ std::vector<double> ParametryARX::stringToVector(const QString& str) const
         tempS.replace(",", ".");
         bool ok;
         double val = tempS.toDouble(&ok);
-        if(ok) vec.push_back(val);
+        if(ok) {
+            // zakres: <-2.0, 2.0>
+            val = std::clamp(val, -2.0, 2.0);
+            vec.push_back(val);
+        }
     }
     return vec;
 }

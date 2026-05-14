@@ -6,118 +6,104 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>264</width>
+    <height>231</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Dialog</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <widget class="QComboBox" name="comboBoxRola">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>40</y>
-     <width>141</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Regulator (serwer)</string>
-    </property>
+  <property name="windowTitle">
+   <string>Ustawienia sieci</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lineEditPort">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="comboBoxRola">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>Regulator (serwer)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Obiekt (klient)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblAdres_2">
+       <property name="text">
+        <string>Port:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblRola">
+       <property name="text">
+        <string>Rola:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblAdres">
+       <property name="text">
+        <string>Adres IP:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEditIP">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item>
-    <property name="text">
-     <string>Obiekt (klient)</string>
-    </property>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButtonOk">
+       <property name="text">
+        <string>Połącz</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonAnuluj">
+       <property name="text">
+        <string>Anuluj</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEditIP">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>100</y>
-     <width>141</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButtonOk">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>230</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Połącz</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButtonAnuluj">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>230</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Anuluj</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblRola">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>40</y>
-     <width>49</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Rola:</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblAdres">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>110</y>
-     <width>101</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Adres IP:</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblAdres_2">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>140</y>
-     <width>101</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Port:</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEditPort">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>140</y>
-     <width>141</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
+  </layout>
  </widget>
  <resources/>
  <connections/>

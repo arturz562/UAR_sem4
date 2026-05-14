@@ -4,7 +4,7 @@
 
 ModelARX::ModelARX(const std::vector<double>& i_A, const std::vector<double>& i_B, int i_op, double i_oss)
     : m_A(i_A), m_B(i_B),
-    u_min(-10.0), u_max(10.0), y_min(-10.0), y_max(10.0), m_ograniczenia(true), rozklad_szumu(0.0, 1.0)
+    u_min(-10.0), u_max(10.0), y_min(-10.0), y_max(10.0), /*m_ograniczenia(true),*/ rozklad_szumu(0.0, 1.0)
 {
     if (m_A.empty()) m_A = {-0.4, 0.0, 0.0};
     if (m_B.empty()) m_B = {0.6, 0.0, 0.0};
@@ -54,14 +54,14 @@ double ModelARX::obliczWyjscie()
 }
 double ModelARX::symuluj(double i_u)
 {
-    double u_in = m_ograniczenia ? std::clamp(i_u, u_min, u_max) : i_u;
+    double u_in = /*m_ograniczenia ?*/ std::clamp(i_u, u_min, u_max);// : i_u;
 
     m_u.push_back(u_in);
     if (m_u.size() > (size_t)(m_ot + m_B.size() + 10)) m_u.pop_front();
 
     double y_out = obliczWyjscie();
 
-    if (m_ograniczenia) y_out = std::clamp(y_out, y_min, y_max);
+    /*if (m_ograniczenia)*/ y_out = std::clamp(y_out, y_min, y_max);
 
     m_y.push_back(y_out);
     if (m_y.size() > (size_t)(m_A.size() + 10)) m_y.pop_front();
@@ -85,7 +85,7 @@ void ModelARX::setOpoznienieTransportowe(int i_ot) { if (i_ot < 1) return; m_ot 
 void ModelARX::setOdchylenieStandardoweSzumu(double s) { ustawRozkladSzumu(s); }
 void ModelARX::setOgraniczeniaSterowania(double min, double max) { u_min = min; u_max = max; }
 void ModelARX::setOgraniczeniaWyjscia(double min, double max) { y_min = min; y_max = max; }
-void ModelARX::setOgraniczenia(bool ogr) { m_ograniczenia = ogr; }
+//void ModelARX::setOgraniczenia(bool ogr) { m_ograniczenia = ogr; }
 
 std::vector<double> ModelARX::getA() const { return m_A; }
 std::vector<double> ModelARX::getB() const { return m_B; }

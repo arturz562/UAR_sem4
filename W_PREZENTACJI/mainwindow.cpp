@@ -24,12 +24,27 @@ MainWindow::MainWindow(QWidget *parent, KlasaUslugowa *usluga)
 {
     ui->setupUi(this);
 
+    // --- PID  ---
+    ui->spinPidKp->setRange(0.0, 100.0); ui->spinPidKp->setSingleStep(0.1);
+    ui->spinPidTi->setRange(0.0, 100.0); ui->spinPidTi->setSingleStep(1.0);
+    ui->spinPidTd->setRange(0.0, 100.0); ui->spinPidTd->setSingleStep(0.1);
+
+    // --- GENERATOR  ---
+    ui->spinAmplituda->setRange(0.0, 100.0);   ui->spinAmplituda->setSingleStep(1.0);
+    ui->spinOkres->setRange(0.0, 100.0);       ui->spinOkres->setSingleStep(1.0);
+    ui->spinWypelnienie->setRange(0.0, 1.0);   ui->spinWypelnienie->setSingleStep(0.1);
+    ui->spinSkladowaStala->setRange(-100.0, 100.0); ui->spinSkladowaStala->setSingleStep(1.0);
+
+    // --- PARAMETRY SYMULACJI  ---
+    ui->spinInterwal->setRange(10, 500);         ui->spinInterwal->setSingleStep(10);
+    ui->spinOknoObserwacji->setRange(5, 50);     ui->spinOknoObserwacji->setSingleStep(5);
+
     if (!m_usluga) {
         m_usluga = new KlasaUslugowa(this);
     }
 
-    ui->label_2->setVisible(false);
-    ui->labelPolaczono->setVisible(false);
+    ui->labelTryb->setText("");
+    ui->labelCzyPolaczono->setText("");
 
     QVBoxLayout* layoutMain = new QVBoxLayout(ui->widgetWykresy);
     layoutMain->setContentsMargins(0, 0, 0, 0);
@@ -427,11 +442,18 @@ void MainWindow::on_pushPolaczSiec_clicked()
             connect(m_serwer, &MyTCPServer::odebranoKonfigARX, this, &MainWindow::naOdebranoKonfigARX);
             connect(m_serwer, &MyTCPServer::odebranoAkcjeSymulacji, this, &MainWindow::naOdebranoAkcjeSymulacji);
 
+            connect(m_serwer, &MyTCPServer::newClientConnected, this, [this](QString adr) {
+                QString msg = "Połączono z klientem. IP: " + adr;
+                ui->labelCzyPolaczono->setText(msg); // Wyświetla w pasku na dole przez 5 sekund
+            });
+
+            connect(m_serwer, &MyTCPServer::clientDisconnected, this, [this](int id) {
+                QMessageBox::warning(this, "Połączenie przerwane",
+                                     "Klient rozłączył się. Powrót do trybu stacjonarnego.");
+                ustawTrybGUI(TrybPracy::Stacjonarny); // Przywraca kontrolki ARX
+            });
+
             m_serwer->startListening(dialog.getPort());
-
-            ui->label_2->setVisible(true);
-
-            ui->labelTryb->setText("Regulator");
         } else {
             ustawTrybGUI(TrybPracy::SieciowyObiekt);
 
@@ -444,9 +466,18 @@ void MainWindow::on_pushPolaczSiec_clicked()
             connect(m_klient, &MyTCPClient::odebranoKonfigARX, this, &MainWindow::naOdebranoKonfigARX);
             connect(m_klient, &MyTCPClient::odebranoAkcjeSymulacji, this, &MainWindow::naOdebranoAkcjeSymulacji);
 
-            m_klient->connectTo(dialog.getIP(), dialog.getPort());
+            connect(m_klient, &MyTCPClient::connected, this, [this](QString adr, int port) {
+                QString msg = QString("Połączono z serwerem. Adres: %1:%2").arg(adr).arg(port);
+                ui->labelCzyPolaczono->setText(msg);
+            });
 
-            ui->labelTryb->setText("Obiekt");
+            connect(m_klient, &MyTCPClient::disconnected, this, [this]() {
+                QMessageBox::warning(this, "Błąd sieci",
+                                     "Utracono połączenie z Serwerem. Powrót do trybu stacjonarnego.");
+                ustawTrybGUI(TrybPracy::Stacjonarny); // Odblokowuje kontrolki PID/Generatora
+            });
+
+            m_klient->connectTo(dialog.getIP(), dialog.getPort());
         }
     }
 }
@@ -462,6 +493,8 @@ void MainWindow::ustawTrybGUI(TrybPracy tryb)
         ui->groupBox_Gen->setEnabled(true);
         ui->groupBox_PID->setEnabled(true);
         ui->groupBox_ARX->setEnabled(true);
+        ui->labelTryb->setText("");
+        ui->labelCzyPolaczono->setText("");
         break;
 
     case TrybPracy::SieciowyRegulator:
@@ -470,6 +503,8 @@ void MainWindow::ustawTrybGUI(TrybPracy tryb)
         ui->groupBox_Gen->setEnabled(true);
         ui->groupBox_PID->setEnabled(true);
         ui->groupBox_ARX->setEnabled(false);
+        ui->labelTryb->setText("Tryb:   Regulator");
+        ui->labelCzyPolaczono->setText("Oczekuję na połączenie...");
         break;
 
     case TrybPracy::SieciowyObiekt:
@@ -478,6 +513,8 @@ void MainWindow::ustawTrybGUI(TrybPracy tryb)
         ui->groupBox_Gen->setEnabled(false);
         ui->groupBox_PID->setEnabled(false);
         ui->groupBox_ARX->setEnabled(true);
+        ui->labelTryb->setText("Tryb:   Obiekt");
+        ui->labelCzyPolaczono->setText("Oczekuję na połączenie...");
         break;
     }
 }
